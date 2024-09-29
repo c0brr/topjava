@@ -74,7 +74,6 @@ public class UserMealsUtil {
         AtomicInteger finishedThreads = new AtomicInteger();
         ExecutorService executorService = Executors.newCachedThreadPool();
         CountDownLatch countDownLatch = new CountDownLatch(meals.size());
-        Object lock = new Object();
         Map<LocalDate, Integer> datesAndCalories = new HashMap<>();
 
         for (UserMeal meal : meals) {
@@ -90,9 +89,8 @@ public class UserMealsUtil {
                     result.add(new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
                             meal.getCalories(), datesAndCalories.get(mealDate) > caloriesPerDay));
                 }
-                synchronized (lock) {
-                    finishedThreads.incrementAndGet();
-                }
+
+                finishedThreads.incrementAndGet();
             });
             countDownLatch.countDown();
         }
@@ -108,16 +106,12 @@ public class UserMealsUtil {
         return meals.stream()
                 .collect(Collectors.groupingBy(meal -> meal.getDateTime().toLocalDate(), Collectors.toList()))
                 .values().stream()
-                .collect(Collectors.partitioningBy(list -> list.stream()
-                        .mapToInt(UserMeal::getCalories)
-                        .sum() > caloriesPerDay))
-                .entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .flatMap(list -> list.stream()
-                                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(),
-                                        startTime, endTime)))
+                .flatMap(list -> list.stream()
+                        .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
                         .map(meal -> new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
-                                meal.getCalories(), entry.getKey())))
+                                meal.getCalories(), list.stream()
+                                .mapToInt(UserMeal::getCalories)
+                                .sum() > caloriesPerDay)))
                 .collect(Collectors.toList());
     }
 }
