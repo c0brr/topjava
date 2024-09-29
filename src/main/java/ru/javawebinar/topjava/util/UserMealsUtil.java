@@ -42,15 +42,15 @@ public class UserMealsUtil {
                                                             LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> datesAndCalories = new HashMap<>();
         for (UserMeal meal : meals) {
-            LocalDate ld = meal.getDateTime().toLocalDate();
-            datesAndCalories.put(ld, datesAndCalories.getOrDefault(ld, 0) + meal.getCalories());
+            LocalDate mealDate = meal.getDateTime().toLocalDate();
+            datesAndCalories.put(mealDate, datesAndCalories.getOrDefault(mealDate, 0) + meal.getCalories());
         }
         List<UserMealWithExcess> result = new ArrayList<>();
         for (UserMeal meal : meals) {
-            LocalDateTime ldt = meal.getDateTime();
-            if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                result.add(new UserMealWithExcess(ldt, meal.getDescription(), meal.getCalories(),
-                        datesAndCalories.get(ldt.toLocalDate()) > caloriesPerDay));
+            LocalDateTime mealDateTime = meal.getDateTime();
+            if (TimeUtil.isBetweenHalfOpen(mealDateTime.toLocalTime(), startTime, endTime)) {
+                result.add(new UserMealWithExcess(mealDateTime, meal.getDescription(), meal.getCalories(),
+                        datesAndCalories.get(mealDateTime.toLocalDate()) > caloriesPerDay));
             }
         }
         return result;
@@ -62,9 +62,9 @@ public class UserMealsUtil {
                 .collect(Collectors.toMap(meal ->
                         meal.getDateTime().toLocalDate(), UserMeal::getCalories, Integer::sum));
         return meals.stream()
+                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
                 .map(meal -> new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(),
                         datesAndCalories.get(meal.getDateTime().toLocalDate()) > caloriesPerDay))
-                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
                 .collect(Collectors.toList());
     }
 
@@ -74,13 +74,12 @@ public class UserMealsUtil {
         AtomicInteger finishedThreads = new AtomicInteger();
         ExecutorService executorService = Executors.newCachedThreadPool();
         CountDownLatch countDownLatch = new CountDownLatch(meals.size());
+        Object lock = new Object();
         Map<LocalDate, Integer> datesAndCalories = new HashMap<>();
-        Map<LocalDate, Boolean> datesAndExcesses = new HashMap<>();
 
         for (UserMeal meal : meals) {
-            LocalDate ld = meal.getDateTime().toLocalDate();
-            datesAndCalories.put(ld, datesAndCalories.getOrDefault(ld, 0) + meal.getCalories());
-            datesAndExcesses.put(ld, datesAndCalories.get(ld) > caloriesPerDay);
+            LocalDate mealDate = meal.getDateTime().toLocalDate();
+            datesAndCalories.put(mealDate, datesAndCalories.getOrDefault(mealDate, 0) + meal.getCalories());
             executorService.execute(() -> {
                 if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                     try {
@@ -89,9 +88,11 @@ public class UserMealsUtil {
                         throw new RuntimeException(e);
                     }
                     result.add(new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
-                            meal.getCalories(), datesAndExcesses.get(ld)));
+                            meal.getCalories(), datesAndCalories.get(mealDate) > caloriesPerDay));
                 }
-                incrementFinishedThreads(finishedThreads);
+                synchronized (lock) {
+                    finishedThreads.incrementAndGet();
+                }
             });
             countDownLatch.countDown();
         }
@@ -106,22 +107,17 @@ public class UserMealsUtil {
                                                                   LocalTime endTime, int caloriesPerDay) {
         return meals.stream()
                 .collect(Collectors.groupingBy(meal -> meal.getDateTime().toLocalDate(), Collectors.toList()))
+                .values().stream()
+                .collect(Collectors.partitioningBy(list -> list.stream()
+                        .mapToInt(UserMeal::getCalories)
+                        .sum() > caloriesPerDay))
                 .entrySet().stream()
-                .collect(Collectors.toMap(entry -> entry.getValue().stream()
-                        .mapToInt(UserMeal::getCalories).sum() > caloriesPerDay, Map.Entry::getValue))
-                .entrySet().stream()
-                .map(entry -> entry.getValue().stream()
-                        .filter(meal ->
-                                TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
-                        .map(meal -> new UserMealWithExcess(meal.getDateTime(),
-                                meal.getDescription(), meal.getCalories(), entry.getKey()))
-                        .collect(Collectors.toList()))
-                .flatMap(List::stream)
+                .flatMap(entry -> entry.getValue().stream()
+                        .flatMap(list -> list.stream()
+                                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(),
+                                        startTime, endTime)))
+                        .map(meal -> new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
+                                meal.getCalories(), entry.getKey())))
                 .collect(Collectors.toList());
-
-    }
-
-    private static synchronized void incrementFinishedThreads(AtomicInteger atomicInteger) {
-        atomicInteger.set(atomicInteger.incrementAndGet());
     }
 }
