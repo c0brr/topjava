@@ -106,12 +106,15 @@ public class UserMealsUtil {
         return meals.stream()
                 .collect(Collectors.groupingBy(meal -> meal.getDateTime().toLocalDate(), Collectors.toList()))
                 .values().stream()
-                .flatMap(list -> list.stream()
-                        .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
-                        .map(meal -> new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
-                                meal.getCalories(), list.stream()
-                                .mapToInt(UserMeal::getCalories)
-                                .sum() > caloriesPerDay)))
+                .flatMap(list -> {
+                    boolean isExcess = list.stream()
+                            .mapToInt(UserMeal::getCalories)
+                            .sum() > caloriesPerDay;
+                    return list.stream()
+                            .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
+                            .map(meal -> new UserMealWithExcess(meal.getDateTime(), meal.getDescription(),
+                                    meal.getCalories(), isExcess));
+                })
                 .collect(Collectors.toList());
     }
 }
