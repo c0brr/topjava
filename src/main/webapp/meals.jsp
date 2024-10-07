@@ -10,6 +10,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2>Meals</h2>
+<p><a href="meals?action=edit">Add Meal</a></p>
 <table>
     <tr>
         <th>Date/Time</th>
@@ -23,6 +24,8 @@
             <td>${mealTo.dateTime.format(MealsUtil.DATE_TIME_FORMATTER)}</td>
             <td>${mealTo.description}</td>
             <td>${mealTo.calories}</td>
+            <td><a href="meals?action=delete&id=${mealTo.id}">Delete</a></td>
+            <td><a href="meals?action=edit&id=${mealTo.id}">Update</a></td>
         </tr>
     </c:forEach>
 </table>
