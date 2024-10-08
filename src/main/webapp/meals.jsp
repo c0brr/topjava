@@ -19,7 +19,7 @@
     </tr>
     <jsp:useBean id="mealsTo" scope="request" type="java.util.List"/>
     <c:forEach items="${mealsTo}" var="mealTo">
-        <jsp:useBean id="mealTo" scope="request" class="ru.javawebinar.topjava.model.MealTo"/>
+        <jsp:useBean id="mealTo" type="ru.javawebinar.topjava.model.MealTo"/>
         <tr style="color: ${mealTo.excess ? 'red' : 'forestgreen'}">
             <td>${mealTo.dateTime.format(MealsUtil.DATE_TIME_FORMATTER)}</td>
             <td>${mealTo.description}</td>

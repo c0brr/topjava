@@ -9,35 +9,35 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealsMemoryStorage implements MealsStorage {
-    private static final AtomicInteger counter = new AtomicInteger(1);
-    private static final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
+public class MemoryMealsStorage implements MealsStorage {
+    private final AtomicInteger counter = new AtomicInteger(1);
+    private final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
 
-    public MealsMemoryStorage() {
-        for (Meal meal : MealsUtil.meals) {
-            add(meal);
-        }
+    public MemoryMealsStorage() {
+        MealsUtil.meals.forEach(this::add);
     }
 
     @Override
     public Meal add(Meal meal) {
-        Integer id = counter.getAndIncrement();
+        int id = counter.getAndIncrement();
         meal.setId(id);
-        return meals.put(id, meal);
+        meals.put(id, meal);
+        return meal;
     }
 
     @Override
     public Meal update(Meal meal) {
-        return meals.replace(meal.getId(), meal);
+        meals.replace(meal.getId(), meal);
+        return meal;
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(int id) {
         meals.remove(id);
     }
 
     @Override
-    public Meal get(Integer id) {
+    public Meal get(int id) {
         return meals.get(id);
     }
 
