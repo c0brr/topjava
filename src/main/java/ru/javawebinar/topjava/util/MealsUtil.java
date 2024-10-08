@@ -15,9 +15,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static final int CALORIES_PER_DAY = 2_000;
-    public static final List<Meal> MEALS = Arrays.asList(
+    public static final List<Meal> meals = Arrays.asList(
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -36,16 +36,16 @@ public class MealsUtil {
         return doGetTo(meals, meal -> true, caloriesPerDay);
     }
 
-    private static List<MealTo> doGetTo(List<Meal> meals, Predicate<Meal> predicate, int caloriesPerDay) {
+    private static List<MealTo> doGetTo(List<Meal> meals, Predicate<Meal> filter, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories)));
         return meals.stream()
-                .filter(predicate)
+                .filter(filter)
                 .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess, meal.getId());
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 }
