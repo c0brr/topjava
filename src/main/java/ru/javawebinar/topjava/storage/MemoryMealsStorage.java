@@ -27,13 +27,8 @@ public class MemoryMealsStorage implements MealsStorage {
 
     @Override
     public Meal update(Meal meal) {
-        int id = meal.getId();
-        if (meals.containsKey(id)) {
-            meals.replace(id, meal);
-            return meal;
-        } else {
-            return null;
-        }
+        Meal replacedMeal = meals.replace(meal.getId(), meal);
+        return replacedMeal == null ? null : meal;
     }
 
     @Override
