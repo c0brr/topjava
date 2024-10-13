@@ -7,6 +7,8 @@ import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,39 +20,44 @@ import java.util.stream.Collectors;
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Meal> repository = new ConcurrentHashMap<>();
+    private final Map<Integer, Integer> idStorage = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
         MealsUtil.meals.forEach(meal -> save(meal, 1));
-//        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Еда 2 пользователя Завтрак", 500), 2);
-//        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Еда 2 пользователя Обед", 1000), 2);
-//        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Еда 2 пользователя Ужин", 500), 2);
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Еда 2 пользователя Завтрак", 500), 2);
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Еда 2 пользователя Обед", 1000), 2);
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Еда 2 пользователя Ужин", 500), 2);
     }
 
     @Override
     public Meal save(Meal meal, int userId) {
+        int id;
         if (meal.isNew()) {
-            meal.setId(counter.incrementAndGet());
+            id = counter.incrementAndGet();
+            meal.setId(id);
             meal.setUserId(userId);
-            repository.put(meal.getId(), meal);
+            repository.put(id, meal);
+            idStorage.put(id, userId);
             return meal;
         }
         // handle case: update, but not present in storage
-        int mealId = meal.getId();
-        return repository.get(mealId).getUserId() == userId ?
-                repository.computeIfPresent(mealId, (id, oldMeal) -> meal) : null;
+        id = meal.getId();
+        return idStorage.get(id) == userId ? repository.computeIfPresent(id, (currentId, oldMeal) -> meal) : null;
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        Meal meal = (repository.containsKey(id) && repository.get(id).getUserId() == userId) ? repository.remove(id) : null;
-        return meal != null;
+        if (idStorage.remove(id, userId)) {
+            repository.remove(id);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        Meal meal = repository.get(id);
-        return meal != null && meal.getUserId() == userId ? meal : null;
+        return idStorage.get(id) == userId ? repository.get(id) : null;
     }
 
     @Override
