@@ -20,6 +20,15 @@
 <section>
     <h3><a href="index.html">Home</a></h3>
     <hr/>
+    <h4>From Date(include) To Date(include) From Time(include) To Time(exclude)</h4>
+    <form method="post" action="meals">
+        <input type="hidden" name="action" value="allFiltered">
+        <input type="date" name="startDate" value="${param.startDate}" />
+        <input type="date" name="endDate" value="${param.endDate}" />
+        <input type="time" name="startTime" value="${param.startTime}" />
+        <input type="time" name="endTime" value="${param.endTime}" />
+        <button type="submit">Filter</button>
+    </form>
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
