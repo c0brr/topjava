@@ -26,7 +26,7 @@
         <h3><a href="users">Users</a></h3>
     </c:if>
     <h2>Meals</h2>
-    <form method="post" action="meals">
+    <form method="get" action="meals">
         <input type="hidden" name="action" value="allFiltered">
         <div class="dInput">
             <div class="input-wrapper">
