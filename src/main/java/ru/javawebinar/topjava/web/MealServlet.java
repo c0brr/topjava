@@ -31,7 +31,7 @@ public class MealServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
-        switch (action) {
+        switch (action == null ? "edit" : action) {
             case "allFiltered":
                 String startDate = request.getParameter("startDate");
                 String endDate = request.getParameter("endDate");
@@ -42,24 +42,19 @@ public class MealServlet extends HttpServlet {
                                 endDate.isEmpty() ? null : LocalDate.parse(endDate),
                                 startTime.isEmpty() ? null : LocalTime.parse(startTime),
                                 endTime.isEmpty() ? null : LocalTime.parse(endTime)));
-                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                doGet(request, response);
                 break;
-            case "create":
-            case "update":
+            case "edit":
                 String id = request.getParameter("id");
-                Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                Meal meal = new Meal(id.isEmpty() ? null : Integer.parseInt(id),
                         LocalDateTime.parse(request.getParameter("dateTime")),
                         request.getParameter("description"),
                         Integer.parseInt(request.getParameter("calories")));
-                switch (action) {
-                    case "create":
-                        mealRestController.create(meal);
-                        break;
-                    case "update":
-                        mealRestController.update(meal, Integer.parseInt(id));
+                if (id.isEmpty()) {
+                    mealRestController.create(meal);
+                } else {
+                    mealRestController.update(meal, Integer.parseInt(id));
                 }
-                response.sendRedirect("meals");
-                break;
             default:
                 response.sendRedirect("meals");
         }
@@ -76,7 +71,6 @@ public class MealServlet extends HttpServlet {
                 response.sendRedirect("meals");
                 break;
             case "allFiltered":
-                request.setAttribute("meals", request.getParameter("meals"));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "create":

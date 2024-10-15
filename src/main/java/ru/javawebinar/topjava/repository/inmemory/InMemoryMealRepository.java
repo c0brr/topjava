@@ -9,6 +9,7 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,7 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public boolean delete(int id, int userId) {
         Map<Integer, Meal> userMeals = repository.get(userId);
-        if (userMeals != null) {
-            Meal meal = userMeals.remove(id);
-            return meal != null;
-        }
-        return false;
+        return userMeals != null && userMeals.remove(id) != null;
     }
 
     @Override
@@ -60,21 +57,20 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        Map<Integer, Meal> userMeals = repository.get(userId);
-        return userMeals == null ? null : doGetAllFiltered(userMeals, meal -> true);
+        return doGetAllFiltered(userId, meal -> true);
     }
 
     @Override
     public List<Meal> getFilteredByDates(int userId, LocalDate startDate, LocalDate endDate) {
-        Map<Integer, Meal> userMeals = repository.get(userId);
-        return userMeals == null ? null : doGetAllFiltered(userMeals,
-                meal -> DateTimeUtil.isDateBetweenClosed(meal.getDate(), startDate, endDate));
+        return doGetAllFiltered(userId, meal -> DateTimeUtil.isDateBetweenClosed(meal.getDate(), startDate, endDate));
     }
 
-    private List<Meal> doGetAllFiltered(Map<Integer, Meal> userMeals, Predicate<Meal> filter) {
-        return userMeals.values().stream()
-                .filter(filter)
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
-                .collect(Collectors.toList());
+    private List<Meal> doGetAllFiltered(int userId, Predicate<Meal> filter) {
+        Map<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals == null ? Collections.emptyList() :
+                userMeals.values().stream()
+                        .filter(filter)
+                        .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                        .collect(Collectors.toList());
     }
 }
