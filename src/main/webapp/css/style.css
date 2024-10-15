@@ -1,0 +1,25 @@
+.dInput {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 10%;
+    flex: 3%;
+}
+
+.dInput label {
+    display: block;
+    padding: 6px;
+}
+
+.dInput input {
+    padding: 5px;
+    margin-left: 5px;
+    /*width: 10%;*/
+    border-radius: 4px;
+}
