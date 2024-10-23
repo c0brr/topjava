@@ -5,8 +5,6 @@ import ru.javawebinar.topjava.model.Meal;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
 
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
@@ -45,38 +43,11 @@ public class MealTestData {
         return updated;
     }
 
-    public static List<Meal> getSortedUserMeals() {
-        List<Meal> userMeals = new ArrayList<>();
-        userMeals.add(userMeal7);
-        userMeals.add(userMeal6);
-        userMeals.add(userMeal5);
-        userMeals.add(userMeal4);
-        userMeals.add(userMeal3);
-        userMeals.add(userMeal2);
-        userMeals.add(userMeal1);
-        return userMeals;
-    }
-
-    public static List<Meal> getSortedAdminMeals() {
-        List<Meal> adminMeals = new ArrayList<>();
-        adminMeals.add(adminMeal2);
-        adminMeals.add(adminMeal1);
-        return adminMeals;
-    }
-
-    public static List<Meal> getUserMealsBetweenDates() {
-        List<Meal> userMeals = new ArrayList<>();
-        userMeals.add(userMeal3);
-        userMeals.add(userMeal2);
-        userMeals.add(userMeal1);
-        return userMeals;
-    }
-
     public static void assertMatch(Meal actual, Meal expected) {
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
-    public static void assertMatch(List<Meal> actual, List<Meal> expected) {
+    public static void assertMatch(Iterable<Meal> actual, Iterable<Meal> expected) {
         Assertions.assertThat(actual).usingRecursiveFieldByFieldElementComparator().isEqualTo(expected);
     }
 }
