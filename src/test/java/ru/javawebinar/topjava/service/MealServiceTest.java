@@ -41,22 +41,22 @@ public class MealServiceTest {
 
     @Test
     public void getForUser() {
-        MealTestData.assertMatch(service.get(MEAL_5_ID, USER_ID), userMeal5);
+        MealTestData.assertMatch(service.get(USER_MEAL_5_ID, USER_ID), userMeal5);
     }
 
     @Test
     public void getForAdmin() {
-        MealTestData.assertMatch(service.get(MEAL_8_ID, ADMIN_ID), adminMeal1);
+        MealTestData.assertMatch(service.get(ADMIN_MEAL_1_ID, ADMIN_ID), adminMeal1);
     }
 
     @Test
     public void getNotFoundUserMealForAdmin() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_5_ID, ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> service.get(USER_MEAL_5_ID, ADMIN_ID));
     }
 
     @Test
     public void getNotFoundAdminMealForUser() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_8_ID, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(ADMIN_MEAL_2_ID, USER_ID));
     }
 
     @Test
@@ -66,24 +66,24 @@ public class MealServiceTest {
 
     @Test
     public void deleteForUser() {
-        service.delete(MEAL_1_ID, USER_ID);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_1_ID, USER_ID));
+        service.delete(USER_MEAL_1_ID, USER_ID);
+        assertThrows(NotFoundException.class, () -> service.get(USER_MEAL_1_ID, USER_ID));
     }
 
     @Test
     public void deleteForAdmin() {
-        service.delete(MEAL_9_ID, ADMIN_ID);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_9_ID, ADMIN_ID));
+        service.delete(ADMIN_MEAL_2_ID, ADMIN_ID);
+        assertThrows(NotFoundException.class, () -> service.get(ADMIN_MEAL_2_ID, ADMIN_ID));
     }
 
     @Test
     public void deleteNotFoundUserMealForAdmin() {
-        assertThrows(NotFoundException.class, () -> service.delete(MEAL_1_ID, ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(USER_MEAL_1_ID, ADMIN_ID));
     }
 
     @Test
     public void deleteNotFoundAdminMealForUser() {
-        assertThrows(NotFoundException.class, () -> service.delete(MEAL_9_ID, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(ADMIN_MEAL_1_ID, USER_ID));
     }
 
     @Test
@@ -123,7 +123,7 @@ public class MealServiceTest {
     @Test
     public void update() {
         service.update(MealTestData.getUpdated(), USER_ID);
-        MealTestData.assertMatch(service.get(MEAL_5_ID, USER_ID), MealTestData.getUpdated());
+        MealTestData.assertMatch(service.get(USER_MEAL_5_ID, USER_ID), MealTestData.getUpdated());
     }
 
     @Test
