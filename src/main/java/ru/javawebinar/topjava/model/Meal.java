@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries({
-        @NamedQuery(name = Meal.UPDATE, query = "UPDATE Meal m SET m.dateTime=:dateTime, m.description=:description, " +
-                "m.calories=:calories WHERE m.id=:id AND m.user.id=:userId"),
-        @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.GET_ALL, query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY dateTime DESC"),
         @NamedQuery(name = Meal.GET_ALL_BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m WHERE m.user.id=:userId " +
@@ -21,8 +18,6 @@ import java.time.LocalTime;
 @Table(name = "meal", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "date_time"}))
 public class Meal extends AbstractBaseEntity {
 
-    public static final String UPDATE = "Meal.update";
-    public static final String GET = "Meal.get";
     public static final String DELETE = "Meal.delete";
     public static final String GET_ALL = "Meal.getAll";
     public static final String GET_ALL_BETWEEN_HALF_OPEN = "Meal.getBetweenHalfOpen";
@@ -37,11 +32,11 @@ public class Meal extends AbstractBaseEntity {
     private String description;
 
     @Column(name = "calories", nullable = false)
-    @NotNull
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @NotNull
     private User user;
 
     public Meal() {
