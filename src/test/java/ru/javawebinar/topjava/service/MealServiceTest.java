@@ -1,6 +1,6 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.AfterClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Stopwatch;
@@ -19,8 +19,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -35,34 +34,28 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-    private static final Map<String, Long> testDurations = new LinkedHashMap<>();
+    private static String durationSummary = "\n";
 
     @Autowired
     private MealService service;
 
     @Rule
-    public final Stopwatch stopwatch = new Stopwatch() {
+    public final Stopwatch methodStopwatch = new Stopwatch() {
         @Override
-        protected void succeeded(long nanos, Description description) {
-            doLog(nanos, description.getMethodName());
-        }
-
-        @Override
-        protected void failed(long nanos, Throwable e, Description description) {
-            doLog(nanos, description.getMethodName());
-        }
-
-        private void doLog(long nanos, String methodName) {
-            long durationMs = Math.round((double) nanos / 1_000_000);
-            log.info("DURATION TEST: {} ms", durationMs);
-            testDurations.put(methodName, durationMs);
+        protected void finished(long nanos, Description description) {
+            long durationMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
+            log.info("DURATION: {} ms", durationMs);
+            durationSummary += String.format("%-30s- %10s ms\n", description.getMethodName(), durationMs);
         }
     };
 
-    @AfterClass
-    public static void durationSummary() {
-        testDurations.forEach((methodName, duration) -> log.info("TEST {} - DURATION {} ms", methodName, duration));
-    }
+    @ClassRule
+    public static final Stopwatch classStopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            log.info("{}", durationSummary);
+        }
+    };
 
     @Test
     public void delete() {
