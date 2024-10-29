@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,6 +19,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -26,9 +34,35 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final Map<String, Long> testDurations = new LinkedHashMap<>();
 
     @Autowired
     private MealService service;
+
+    @Rule
+    public final Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            doLog(nanos, description.getMethodName());
+        }
+
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            doLog(nanos, description.getMethodName());
+        }
+
+        private void doLog(long nanos, String methodName) {
+            long durationMs = Math.round((double) nanos / 1_000_000);
+            log.info("DURATION TEST: {} ms", durationMs);
+            testDurations.put(methodName, durationMs);
+        }
+    };
+
+    @AfterClass
+    public static void durationSummary() {
+        testDurations.forEach((methodName, duration) -> log.info("TEST {} - DURATION {} ms", methodName, duration));
+    }
 
     @Test
     public void delete() {
