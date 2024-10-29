@@ -4,6 +4,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Stopwatch;
+import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -39,21 +40,21 @@ public class MealServiceTest {
     @Autowired
     private MealService service;
 
-    @Rule
-    public final Stopwatch methodStopwatch = new Stopwatch() {
+    @ClassRule(order = Integer.MIN_VALUE)
+    public static final TestWatcher testWatcher = new TestWatcher() {
         @Override
-        protected void finished(long nanos, Description description) {
-            long durationMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
-            log.info("DURATION: {} ms", durationMs);
-            durationSummary += String.format("%-30s- %10s ms\n", description.getMethodName(), durationMs);
+        protected void finished(Description description) {
+            log.info("{}", durationSummary);
         }
     };
 
-    @ClassRule
-    public static final Stopwatch classStopwatch = new Stopwatch() {
+    @Rule
+    public final Stopwatch Stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            log.info("{}", durationSummary);
+            long durationMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
+            log.info("{} - {} ms", description.getMethodName(), durationMs);
+            durationSummary += String.format("%-30s- %10s ms\n", description.getMethodName(), durationMs);
         }
     };
 
