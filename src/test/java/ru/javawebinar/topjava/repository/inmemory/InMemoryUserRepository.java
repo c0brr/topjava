@@ -37,4 +37,9 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public User getWithMeals(int id) {
+        throw new UnsupportedOperationException("Operation is unsupported");
+    }
 }
