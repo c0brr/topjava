@@ -82,5 +82,10 @@ public abstract class AbstractJdbcMealRepository<T> implements MealRepository {
                 ROW_MAPPER, userId, doGetDateTime(startDateTime), doGetDateTime(endDateTime));
     }
 
+    @Override
+    public Meal getWithUser(int id, int userId) {
+        throw new UnsupportedOperationException("Operation is unsupported");
+    }
+
     protected abstract T doGetDateTime(LocalDateTime localDateTime);
 }
