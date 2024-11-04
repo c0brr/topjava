@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.web.meal.MealRestController;
@@ -10,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +29,14 @@ public class MealServlet extends HttpServlet {
 
     @Override
     public void init() {
-        springContext = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/spring-db.xml");
+        springContext = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/spring-db.xml") {
+            @Override
+            public ConfigurableEnvironment getEnvironment() {
+                ConfigurableEnvironment configurableEnvironment = super.getEnvironment();
+                configurableEnvironment.setActiveProfiles("datajpa", "postgres");
+                return configurableEnvironment;
+            }
+        };
         mealController = springContext.getBean(MealRestController.class);
     }
 
