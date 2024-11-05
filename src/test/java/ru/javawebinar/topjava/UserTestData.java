@@ -39,7 +39,13 @@ public class UserTestData {
 
     public static User getExpectedWithMeals() {
         User expected = new User(user);
-        expected.setMeals(List.of(meal1, meal2, meal3, meal4, meal5, meal6, meal7));
+        expected.setMeals(List.of(meal7, meal6, meal5, meal4, meal3, meal2, meal1));
+        return expected;
+    }
+
+    public static User getExpectedGuestWithMeals() {
+        User expected = new User(guest);
+        expected.setMeals(Collections.emptyList());
         return expected;
     }
 }
