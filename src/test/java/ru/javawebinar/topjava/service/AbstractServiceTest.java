@@ -26,9 +26,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 public abstract class AbstractServiceTest {
 
-    public static final Logger log = getLogger("result");
+    private static final Logger log = getLogger("result");
 
-    public static final StringBuilder results = new StringBuilder();
+    private static final StringBuilder results = new StringBuilder();
 
     @Rule
     // http://stackoverflow.com/questions/14892125/what-is-the-best-practice-to-determine-the-execution-time-of-the-bussiness-relev

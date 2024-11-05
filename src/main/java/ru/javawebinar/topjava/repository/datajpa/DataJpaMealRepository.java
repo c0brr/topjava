@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class DataJpaMealRepository implements MealRepository {
@@ -32,7 +33,7 @@ public class DataJpaMealRepository implements MealRepository {
     }
 
     private Meal getChecked(int id, int userId) {
-        return crudMealRepository.findById(id).filter(meal -> meal.getUser().getId() == userId).orElse(null);
+        return crudMealRepository.findById(id).filter(meal -> Objects.equals(userId, meal.getUser().getId())).orElse(null);
     }
 
     @Override
