@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.Assume;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
@@ -13,7 +14,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.TimingRules;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
@@ -28,7 +32,7 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 public abstract class AbstractServiceTest {
 
     @Autowired
-    protected Environment env;
+    private Environment env;
 
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
@@ -45,5 +49,9 @@ public abstract class AbstractServiceTest {
                 throw getRootCause(e);
             }
         });
+    }
+
+    protected void checkJdbcProfile() {
+        Assume.assumeFalse(Arrays.asList(env.getActiveProfiles()).contains(Profiles.JDBC));
     }
 }
