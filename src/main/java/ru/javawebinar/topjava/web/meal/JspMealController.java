@@ -29,19 +29,19 @@ public class JspMealController extends AbstractMealController {
     }
 
     @GetMapping
-    public String getAllMeals(Model model) {
+    public String getAll(Model model) {
         model.addAttribute("meals", getAll());
         return "meals";
     }
 
-    @GetMapping(params = {"delete", "id"})
-    public String deleteMeal(HttpServletRequest request) {
+    @GetMapping("/delete")
+    public String delete(HttpServletRequest request) {
         delete(getId(request));
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
-    @GetMapping(params = {"startDate", "endDate", "startTime", "endTime"})
-    public String getAllFilteredMeals(Model model, HttpServletRequest request) {
+    @GetMapping("/filter")
+    public String getAllFiltered(Model model, HttpServletRequest request) {
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
@@ -50,23 +50,22 @@ public class JspMealController extends AbstractMealController {
         return "meals";
     }
 
-    @GetMapping(params = "create")
-    public String createMeal(Model model) {
+    @GetMapping("/create")
+    public String create(Model model) {
         Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @GetMapping(params = {"update", "id"})
-    public String updateMeal(Model model, HttpServletRequest request) {
+    @GetMapping("/update")
+    public String update(Model model, HttpServletRequest request) {
         Meal meal = get(getId(request));
         model.addAttribute("meal", meal);
         return "mealForm";
     }
 
     @PostMapping
-    public String postMeal(HttpServletRequest request) throws UnsupportedEncodingException {
-        request.setCharacterEncoding("UTF-8");
+    public String save(HttpServletRequest request) throws UnsupportedEncodingException {
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
@@ -76,7 +75,7 @@ public class JspMealController extends AbstractMealController {
         } else {
             create(meal);
         }
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
     private int getId(HttpServletRequest request) {
