@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.repository.jdbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -15,6 +16,7 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.ValidationUtil;
 
+import javax.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -23,11 +25,15 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
 
+    private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
+
     private final JdbcTemplate jdbcTemplate;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
+
+    private final Validator validator;
 
     private final ResultSetExtractor<List<User>> extractor = rs -> {
         Map<Integer, User> users = new LinkedHashMap<>();
@@ -35,14 +41,9 @@ public class JdbcUserRepository implements UserRepository {
             int id = rs.getInt("id");
             String role = rs.getString("role");
             if (!users.containsKey(id)) {
-                users.put(id, new User(id,
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getInt("calories_per_day"),
-                        rs.getBoolean("enabled"),
-                        rs.getDate("registered"),
-                        role != null ? Set.of(Role.valueOf(role)) : Collections.emptySet()));
+                User user = ROW_MAPPER.mapRow(rs, rs.getRow());
+                user.setRoles(role != null ? Set.of(Role.valueOf(role)) : Collections.emptySet());
+                users.put(id, user);
             } else {
                 users.get(id).getRoles().add(Role.valueOf(role));
             }
@@ -51,19 +52,21 @@ public class JdbcUserRepository implements UserRepository {
     };
 
     @Autowired
-    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+                              Validator validator) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.validator = validator;
     }
 
     @Override
     @Transactional
     public User save(User user) {
-        ValidationUtil.jdbcValidate(user);
+        ValidationUtil.validate(user, validator);
 
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
