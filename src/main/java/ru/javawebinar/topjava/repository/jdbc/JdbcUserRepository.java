@@ -16,7 +16,6 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.ValidationUtil;
 
-import javax.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -32,8 +31,6 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
-
-    private final Validator validator;
 
     private final ResultSetExtractor<List<User>> extractor = rs -> {
         Map<Integer, User> users = new LinkedHashMap<>();
@@ -52,21 +49,19 @@ public class JdbcUserRepository implements UserRepository {
     };
 
     @Autowired
-    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-                              Validator validator) {
+    public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.validator = validator;
     }
 
     @Override
     @Transactional
     public User save(User user) {
-        ValidationUtil.validate(user, validator);
+        ValidationUtil.validate(user);
 
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
