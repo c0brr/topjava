@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
@@ -31,7 +32,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(mealTo7, mealTo6, mealTo5, mealTo4, mealTo3, mealTo2, mealTo1));
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealTos));
     }
 
     @Test
@@ -79,9 +80,24 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "filter?start=2020-01-30T00:00:00&end=2020-01-31T13:00:01"))
+        doGetBetween("startDate=2020-01-30&startTime=00:01&endDate=2020-01-31&endTime=13:01",
+                mealTo6, mealTo5, mealTo2, mealTo1);
+    }
+
+    @Test
+    void getBetweenWithNullTime() throws Exception {
+        doGetBetween("startDate=2020-01-30&endDate=2020-01-30", mealTo3, mealTo2, mealTo1);
+    }
+
+    @Test
+    void getBetweenWithNullDates() throws Exception {
+        doGetBetween("startTime=10:00&endTime=13:00", mealTo5, mealTo1);
+    }
+
+    private void doGetBetween(String params, MealTo... mealTos) throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter?" + params))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(mealTo6, mealTo5, mealTo4, mealTo2, mealTo1));
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealTos));
     }
 }

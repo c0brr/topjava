@@ -10,7 +10,7 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ru.javawebinar.topjava.MealTestData.mealsTo;
+import static ru.javawebinar.topjava.MealTestData.mealTos;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 class RootControllerTest extends AbstractControllerTest {
@@ -30,7 +30,7 @@ class RootControllerTest extends AbstractControllerTest {
     @Test
     void getMeals() throws Exception {
         String resource = "meals";
-        doPerform(resource).andExpect(model().attribute(resource, mealsTo));
+        doPerform(resource).andExpect(model().attribute(resource, mealTos));
     }
 
     private ResultActions doPerform(String resource) throws Exception {
