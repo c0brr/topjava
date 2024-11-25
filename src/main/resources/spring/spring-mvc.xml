@@ -7,13 +7,14 @@
 
     <bean class="ru.javawebinar.topjava.web.json.JacksonObjectMapper" id="objectMapper" factory-method="getMapper"/>
 
-    <bean id="customDateTimeFormatAnnotationFormatterFactory"
-          class="ru.javawebinar.topjava.util.format.CustomDateTimeFormatAnnotationFormatterFactory"/>
+    <bean id="customDateFormatter" class="ru.javawebinar.topjava.web.formatter.CustomDateFormatter"/>
+    <bean id="customTimeFormatter" class="ru.javawebinar.topjava.web.formatter.CustomTimeFormatter"/>
 
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
         <property name="formatters">
             <set>
-                <ref bean="customDateTimeFormatAnnotationFormatterFactory"/>
+                <ref bean="customDateFormatter"/>
+                <ref bean="customTimeFormatter"/>
             </set>
         </property>
     </bean>

@@ -89,7 +89,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     @EnabledIf(expression = "#{environment.matchesProfiles('datajpa')}", loadContext = true)
     void getWithMeals() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "100000/with-meals"))
+        perform(MockMvcRequestBuilders.get(REST_URL + USER_ID + "/with-meals"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

@@ -94,6 +94,11 @@ class MealRestControllerTest extends AbstractControllerTest {
         doGetBetween("startTime=10:00&endTime=13:00", mealTo5, mealTo1);
     }
 
+    @Test
+    void getBetweenWithEmptyParams() throws Exception {
+        doGetBetween("startDate=&endTime=", mealTos.toArray(new MealTo[0]));
+    }
+
     private void doGetBetween(String params, MealTo... mealTos) throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + "filter?" + params))
                 .andExpect(status().isOk())
