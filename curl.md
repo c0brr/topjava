@@ -1,7 +1,7 @@
 Get all meals: 
 curl -X GET http://localhost:8080/topjava/rest/meals
 
-Get a meal by its ID: 
+# Get a meal by its ID: 
 curl -X GET http://localhost:8080/topjava/rest/meals/100005
 
 Get meals filtered by date and time. Both dates and start time are included, end time is excluded: 
