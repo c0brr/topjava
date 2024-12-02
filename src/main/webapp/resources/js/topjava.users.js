@@ -45,3 +45,14 @@ $(function () {
         })
     );
 });
+
+function enable(element, id) {
+    $.ajax({
+        type: "PATCH",
+        url: userAjaxUrl + id,
+        data: JSON.stringify(!!$(element).is(":checked")),
+        contentType: "application/json"
+    }).done(function () {
+        updateTable();
+    });
+}
