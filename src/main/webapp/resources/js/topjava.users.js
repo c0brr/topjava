@@ -53,6 +53,9 @@ function enable(element, id) {
         data: JSON.stringify(!!$(element).is(":checked")),
         contentType: "application/json"
     }).done(function () {
-        updateTable();
+        $.get(userAjaxUrl + id, function (data) {
+            element.closest("tr").css('color', JSON.parse(JSON.stringify(data)).enabled === false ?
+                'rgba(184, 182, 182, 0.42)' : '');
+        })
     });
 }

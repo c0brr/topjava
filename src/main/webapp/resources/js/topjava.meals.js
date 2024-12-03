@@ -45,11 +45,11 @@ function filterTable() {
         type: "GET",
         data: form.serialize()
     }).done(function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+        fillTable(data);
     });
 }
 
 function clearFilter() {
-    $('.form-control').val('');
+    $('#filter')[0].reset();
     updateTable();
 }
