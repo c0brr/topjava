@@ -54,8 +54,9 @@ function enable(element, id) {
         contentType: "application/json"
     }).done(function () {
         $.get(userAjaxUrl + id, function (data) {
-            element.closest("tr").css('color', JSON.parse(JSON.stringify(data)).enabled === false ?
-                'rgba(184, 182, 182, 0.42)' : '');
+            let isEnabled = JSON.parse(JSON.stringify(data)).enabled === true;
+            element.closest("tr").css('color', isEnabled ? 'inherit' : 'rgba(184, 182, 182, 0.42)');
+            successNoty(isEnabled ? "Enabled" : "Disabled");
         })
     });
 }
