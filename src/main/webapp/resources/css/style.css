@@ -23,7 +23,7 @@ tr[data-meal-excess="true"] {
     color: red;
 }
 
-tr[data-user-enabled="false"] {
+.disabled {
     color: rgba(184, 182, 182, 0.42);
 }
 
@@ -36,9 +36,11 @@ html {
     position: relative;
     min-height: 100%;
 }
+
 body {
     margin-bottom: 60px !important; /* Margin bottom by footer height */
 }
+
 .footer {
     position: absolute;
     bottom: 0;

@@ -1,8 +1,12 @@
 const mealsAjaxUrl = "profile/meals/";
 const filterForm = $('#filter');
+let isFiltered = false;
 
 const ctx = {
-    ajaxUrl: mealsAjaxUrl
+    ajaxUrl: mealsAjaxUrl,
+    update: function () {
+        return isFiltered ? filterTable() : updateTable();
+    }
 };
 
 $(function () {
@@ -45,12 +49,13 @@ function filterTable() {
         type: "GET",
         data: filterForm.serialize()
     }).done(function (data) {
-        fillTable(data);
         isFiltered = true;
+        fillTable(data);
     });
 }
 
 function clearFilter() {
     filterForm[0].reset();
+    isFiltered = false;
     updateTable();
 }

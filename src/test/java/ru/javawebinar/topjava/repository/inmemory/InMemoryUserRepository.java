@@ -31,11 +31,12 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
 
     @Override
     public boolean enable(int id, boolean enabled) {
-        User user = get(id);
-        if (user != null) {
-            user.setEnabled(enabled);
-        }
-        return user != null;
+        return getCollection()
+                .stream()
+                .filter(u -> u.getId() == id)
+                .peek(u -> u.setEnabled(enabled))
+                .findFirst()
+                .orElse(null) != null;
     }
 
     @Override

@@ -2,7 +2,10 @@ const userAjaxUrl = "admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
+    ajaxUrl: userAjaxUrl,
+    update: function () {
+        updateTable();
+    }
 };
 
 // $(document).ready(function () {
@@ -47,16 +50,17 @@ $(function () {
 });
 
 function enable(element, id) {
+    let isChecked = !!$(element).is(":checked");
     $.ajax({
         type: "PATCH",
         url: userAjaxUrl + id,
-        data: JSON.stringify(!!$(element).is(":checked")),
-        contentType: "application/json"
+        data: JSON.stringify(isChecked),
+        contentType: "application/json",
+        error: function () {
+            $(element).prop('checked', !isChecked);
+        },
     }).done(function () {
-        $.get(userAjaxUrl + id, function (data) {
-            let isEnabled = JSON.parse(JSON.stringify(data)).enabled === true;
-            element.closest("tr").css('color', isEnabled ? 'inherit' : 'rgba(184, 182, 182, 0.42)');
-            successNoty(isEnabled ? "Enabled" : "Disabled");
-        })
+        $(element).closest("tr")[isChecked ? 'removeClass' : 'addClass']('disabled');
+        successNoty(isChecked ? "Enabled" : "Disabled");
     });
 }

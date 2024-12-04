@@ -27,25 +27,14 @@ function deleteRow(id) {
         url: ctx.ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        loadTable()
+        ctx.update();
         successNoty("Deleted");
     });
-}
-
-let isFiltered = false;
-
-function loadTable() {
-    if (isFiltered) {
-        filterTable();
-    } else {
-        updateTable();
-    }
 }
 
 function updateTable() {
     $.get(ctx.ajaxUrl, function (data) {
         fillTable(data);
-        isFiltered = false;
     });
 }
 
@@ -60,7 +49,7 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        loadTable()
+        ctx.update();
         successNoty("Saved");
     });
 }
