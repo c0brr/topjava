@@ -36,7 +36,7 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
                 .filter(u -> u.getId() == id)
                 .peek(u -> u.setEnabled(enabled))
                 .findFirst()
-                .orElse(null) != null;
+                .isPresent();
     }
 
     @Override
