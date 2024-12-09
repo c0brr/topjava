@@ -68,12 +68,8 @@ public class MealUIController extends AbstractMealController {
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Integer.class, "calories", new CustomNumberEditor(Integer.class, true) {
             @Override
-            public void setAsText(String text) throws IllegalArgumentException {
-                if (text.isEmpty()) {
-                    setValue(0);
-                } else {
-                    setValue(Double.parseDouble(text));
-                }
+            public void setAsText(String value) throws IllegalArgumentException {
+                setValue(value.isEmpty() ? 0 : Integer.parseInt(value));
             }
         });
     }
