@@ -28,17 +28,6 @@ const locale = {
             'Вс', 'Пн', 'Вт', 'Ср',
             'Чт', 'Пт', 'Сб'
         ]
-    },
-    en: {
-        months: [
-            'January', 'February', 'March', 'April',
-            'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December'
-        ],
-        dayOfWeekShort: [
-            'Sun', 'Mon', 'Tue', 'Wed',
-            'Thu', 'Fri', 'Sat'
-        ]
     }
 }
 
@@ -123,4 +112,5 @@ $(function () {
             }
         })
     );
+    $.datetimepicker.setLocale(navigator.language);
 });
