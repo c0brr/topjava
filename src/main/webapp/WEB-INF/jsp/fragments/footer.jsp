@@ -6,12 +6,4 @@
     <div class="container">
         <span class="text-muted"><spring:message code="app.footer"/></span>
     </div>
-    <script type="text/javascript" defer>
-        let forEach = function () {
-            <c:forEach var="key" items='${["common.deleted","common.saved","common.enabled","common.disabled",
-            "common.errorStatus","common.confirm"]}'>
-            i18n["${key}"] = "<spring:message code="${key}"/>";
-            </c:forEach>
-        };
-    </script>
 </footer>

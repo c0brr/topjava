@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.Util;
 
 import javax.validation.Valid;
+import java.beans.PropertyEditorSupport;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -66,7 +66,7 @@ public class MealUIController extends AbstractMealController {
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Integer.class, "calories", new CustomNumberEditor(Integer.class, true) {
+        binder.registerCustomEditor(Integer.class, "calories", new PropertyEditorSupport() {
             @Override
             public void setAsText(String value) throws IllegalArgumentException {
                 setValue(value.isEmpty() ? 0 : Integer.parseInt(value));
