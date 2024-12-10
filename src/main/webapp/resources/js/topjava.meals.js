@@ -17,33 +17,17 @@ function clearFilter() {
     $.get(mealAjaxUrl, updateTableByData);
 }
 
-const locale = {
-    ru: {
-        months: [
-            'Январь', 'Февраль', 'Март', 'Апрель',
-            'Май', 'Июнь', 'Июль', 'Август',
-            'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-        ],
-        dayOfWeekShort: [
-            'Вс', 'Пн', 'Вт', 'Ср',
-            'Чт', 'Пт', 'Сб'
-        ]
-    }
-}
-
 $('#startDate').datetimepicker({
     format: 'Y-m-d',
     timepicker: false,
     onChangeDateTime: function (current_date) {
         $('#endDate').datetimepicker("setOptions", {"minDate": current_date === null ? false : current_date});
-    },
-    i18n: locale
+    }
 })
 
 $('#endDate').datetimepicker({
     format: 'Y-m-d',
-    timepicker: false,
-    i18n: locale
+    timepicker: false
 })
 
 $('#startTime').datetimepicker({
@@ -62,8 +46,7 @@ $('#endTime').datetimepicker({
 $('#dateTime').datetimepicker({
     format: 'Y-m-d\\TH:i:s',
     lazyInit: true,
-    validateOnBlur: false,
-    i18n: locale
+    validateOnBlur: false
 })
 
 $(function () {
