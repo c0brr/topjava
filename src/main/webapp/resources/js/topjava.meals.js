@@ -62,6 +62,7 @@ $('#endTime').datetimepicker({
 $('#dateTime').datetimepicker({
     format: 'Y-m-d\\TH:i:s',
     lazyInit: true,
+    validateOnBlur: false,
     i18n: locale
 })
 
