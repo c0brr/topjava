@@ -17,22 +17,35 @@ function clearFilter() {
     $.get(mealAjaxUrl, updateTableByData);
 }
 
+let convertDateTime = function (data) {
+    if (data.hasOwnProperty("dateTime")) {
+        data.dateTime = data.dateTime.substring(0, 16).replace("T", " ");
+    }
+};
+
 $.ajaxSetup({
     converters: {
         "text json": function (result) {
             let json = $.parseJSON(result);
             if (Array.isArray(json)) {
                 json.forEach(element => {
-                    if (element.hasOwnProperty("dateTime")) {
-                        element.dateTime = element.dateTime.substring(0, 16).replace("T", " ");
-                    }
+                    convertDateTime(element);
                 });
             } else {
-                if (json.hasOwnProperty("dateTime")) {
-                    json.dateTime = json.dateTime.substring(0, 16).replace("T", " ");
-                }
+                convertDateTime(json);
             }
             return json;
+        },
+    },
+    beforeSend: function (xhr, settings) {
+        if (settings.hasOwnProperty("data") && settings.url === mealAjaxUrl) {
+            let oldData = settings.data;
+            let beforeDateIndex = oldData.indexOf("dateTime=");
+            let afterDateIndex = oldData.indexOf("description=")
+            settings.data = oldData.substring(0, beforeDateIndex) +
+                oldData.substring(beforeDateIndex, afterDateIndex - 1).replace("+", "T") +
+                "%3A00" +
+                oldData.substring(afterDateIndex - 1);
         }
     }
 });
