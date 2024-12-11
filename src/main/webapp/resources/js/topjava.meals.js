@@ -39,15 +39,12 @@ $.ajaxSetup({
     },
     beforeSend: function (xhr, settings) {
         if (settings.hasOwnProperty("data") && settings.url === mealAjaxUrl) {
-            let oldData = settings.data;
-            let beforeDateIndex = oldData.indexOf("dateTime=");
-            let afterDateIndex = oldData.indexOf("description=");
-            let datePart = oldData.substring(beforeDateIndex, afterDateIndex - 1);
-            if (datePart.lenght > 9) {
-                settings.data = oldData.substring(0, beforeDateIndex) +
-                    oldData.substring(beforeDateIndex, afterDateIndex - 1).replace("+", "T") +
-                    "%3A00" +
-                    oldData.substring(afterDateIndex - 1);
+            let oldData = settings.data.split("&");
+            if (oldData[1].length > 9) {
+                settings.data = oldData[0] + '&' +
+                    oldData[1].replace("+", "T") + "%3A00" + '&' +
+                    oldData[2] + '&' +
+                    oldData[3];
             }
         }
     }
