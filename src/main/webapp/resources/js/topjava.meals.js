@@ -42,8 +42,8 @@ $.ajaxSetup({
             let oldData = settings.data;
             let beforeDateIndex = oldData.indexOf("dateTime=");
             let afterDateIndex = oldData.indexOf("description=");
-            let date = oldData.substring(beforeDateIndex, afterDateIndex - 1);
-            if (date.lenght > 9) {
+            let datePart = oldData.substring(beforeDateIndex, afterDateIndex - 1);
+            if (datePart.lenght > 9) {
                 settings.data = oldData.substring(0, beforeDateIndex) +
                     oldData.substring(beforeDateIndex, afterDateIndex - 1).replace("+", "T") +
                     "%3A00" +
