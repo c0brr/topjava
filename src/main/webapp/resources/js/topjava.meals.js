@@ -17,6 +17,26 @@ function clearFilter() {
     $.get(mealAjaxUrl, updateTableByData);
 }
 
+$.ajaxSetup({
+    converters: {
+        "text json": function (result) {
+            let json = $.parseJSON(result);
+            if (Array.isArray(json)) {
+                json.forEach(element => {
+                    if (element.hasOwnProperty("dateTime")) {
+                        element.dateTime = element.dateTime.substring(0, 16).replace("T", " ");
+                    }
+                });
+            } else {
+                if (json.hasOwnProperty("dateTime")) {
+                    json.dateTime = json.dateTime.substring(0, 16).replace("T", " ");
+                }
+            }
+            return json;
+        }
+    }
+});
+
 $('#startDate').datetimepicker({
     format: 'Y-m-d',
     timepicker: false,
@@ -44,9 +64,8 @@ $('#endTime').datetimepicker({
 })
 
 $('#dateTime').datetimepicker({
-    format: 'Y-m-d\\TH:i:s',
-    lazyInit: true,
-    validateOnBlur: false
+    format: 'Y-m-d H:i',
+    lazyInit: true
 })
 
 $(function () {
@@ -60,13 +79,7 @@ $(function () {
             "info": true,
             "columns": [
                 {
-                    "data": "dateTime",
-                    "render": function (data, type, row) {
-                        if (type === "display") {
-                            return data.substring(0, 16).replace("T", " ");
-                        }
-                        return data;
-                    }
+                    "data": "dateTime"
                 },
                 {
                     "data": "description"
@@ -96,5 +109,4 @@ $(function () {
             }
         })
     );
-    $.datetimepicker.setLocale(navigator.language);
 });

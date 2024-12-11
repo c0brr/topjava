@@ -39,7 +39,8 @@ public class DateTimeFormatters {
 
         @Override
         public LocalDateTime parse(String text, Locale locale) {
-            return LocalDateTime.parse(text);
+            String dateTime = text.substring(0, 10) + "T" + text.substring(11) + ":00";
+            return LocalDateTime.parse(dateTime);
         }
 
         @Override
