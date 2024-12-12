@@ -46,6 +46,11 @@ function updateTableByData(data) {
 }
 
 function save() {
+    let dateTimeField = form.find("#dateTime");
+    let value = dateTimeField.val();
+    if (value !== "") {
+        dateTimeField.val(value.replace(" ", "T") + ":00");
+    }
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl,

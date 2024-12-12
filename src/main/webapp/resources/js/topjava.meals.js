@@ -36,17 +36,6 @@ $.ajaxSetup({
             }
             return json;
         },
-    },
-    beforeSend: function (xhr, settings) {
-        if (settings.hasOwnProperty("data") && settings.url === mealAjaxUrl) {
-            let oldData = settings.data.split("&");
-            if (oldData[1].length > 9) {
-                settings.data = oldData[0] + '&' +
-                    oldData[1].replace("+", "T") + "%3A00" + '&' +
-                    oldData[2] + '&' +
-                    oldData[3];
-            }
-        }
     }
 });
 
