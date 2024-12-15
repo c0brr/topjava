@@ -51,6 +51,12 @@ public class UserTestData {
         return updated;
     }
 
+    public static User getNotValid() {
+        User notValid = new User(user);
+        notValid.setName("");
+        return notValid;
+    }
+
     public static String jsonWithPassword(User user, String passw) {
         return JsonUtil.writeAdditionProps(user, "password", passw);
     }
