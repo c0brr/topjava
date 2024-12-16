@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,6 +21,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -52,6 +54,15 @@ public class ExceptionInfoHandler {
     @ExceptionHandler(Exception.class)
     public ErrorInfo internalError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(BindException.class)
+    public ErrorInfo bindingError(HttpServletRequest req, BindException e) {
+        IllegalRequestDataException irdException = new IllegalRequestDataException(e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.joining("<br>")));
+        return logAndGetErrorInfo(req, irdException, false, VALIDATION_ERROR);
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
