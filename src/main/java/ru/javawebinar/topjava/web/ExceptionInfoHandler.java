@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -68,11 +69,19 @@ public class ExceptionInfoHandler {
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException,
                                                 ErrorType errorType, FieldError... errors) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
+        String message = rootCause.getMessage();
+
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
+
+        if (e.getCause() instanceof ConstraintViolationException) {
+            if (((ConstraintViolationException) e.getCause()).getConstraintName().equals("users_unique_email_idx"))
+                message = "User with this email already exists";
+        }
+
         int errorsLength = errors.length;
         String[] errorsArray = null;
         if (errorsLength != 0) {
@@ -80,6 +89,7 @@ public class ExceptionInfoHandler {
                     .map(fe -> "[" + fe.getField() + "] " + fe.getDefaultMessage())
                     .toArray(String[]::new);
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, errorsLength == 0 ? rootCause.getMessage() : errorsArray);
+
+        return new ErrorInfo(req.getRequestURL(), errorType, errorsLength == 0 ? message : errorsArray);
     }
 }
