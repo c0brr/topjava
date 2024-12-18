@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -27,7 +28,11 @@ public class ProfileUIController extends AbstractUserController {
         if (result.hasErrors()) {
             return "profile";
         } else {
-            super.update(userTo, SecurityUtil.authUserId());
+            try {
+                super.update(userTo, SecurityUtil.authUserId());
+            } catch (DataIntegrityViolationException e) {
+                return processingDIVException(e, result, null);
+            }
             SecurityUtil.get().setTo(userTo);
             status.setComplete();
             return "redirect:/meals";
@@ -50,11 +55,22 @@ public class ProfileUIController extends AbstractUserController {
             try {
                 super.create(userTo);
             } catch (DataIntegrityViolationException e) {
-                model.addAttribute("message", "User with this email already exists");
-                return "exception";
+                return processingDIVException(e, result, model);
             }
             status.setComplete();
             return "redirect:/login?message=app.registered&username=" + userTo.getEmail();
         }
+    }
+
+    private String processingDIVException(DataIntegrityViolationException e, BindingResult result, ModelMap model) {
+        if (e.getCause() instanceof ConstraintViolationException) {
+            if (((ConstraintViolationException) e.getCause()).getConstraintName().equals("users_unique_email_idx")) {
+                result.rejectValue("email", "409", "User with this email already exists");
+            }
+        }
+        if (model != null) {
+            model.addAttribute("register", true);
+        }
+        return "profile";
     }
 }

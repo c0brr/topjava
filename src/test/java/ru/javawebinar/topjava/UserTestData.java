@@ -60,4 +60,8 @@ public class UserTestData {
     public static String jsonWithPassword(User user, String passw) {
         return JsonUtil.writeAdditionProps(user, "password", passw);
     }
+
+    public static User getWithDuplicatedEmail() {
+        return new User(null, "newName", "user@yandex.ru", "12346", 1999, Role.USER);
+    }
 }

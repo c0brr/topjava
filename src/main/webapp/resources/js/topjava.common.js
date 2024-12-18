@@ -108,9 +108,6 @@ function failNoty(jqXHR) {
     closeNoty();
     let errorInfo = jqXHR.responseJSON;
     let processDetails = function (data) {
-        if (!Array.isArray(data)) {
-            return data;
-        }
         let details = "";
         data.forEach(element => {
             details += element + "<br>";
