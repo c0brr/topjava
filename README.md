@@ -1,4 +1,4 @@
-# Calories Management Application
+# Calories Management System
 
 Java Enterprise project with registration/authorization and role-based access control (USER, ADMIN). Administrators can create/edit/delete users, and users can manage their profile and meal data through a UI (via AJAX) and through a REST interface with basic authorization. Meals can be filtered by date and time. The color of meal table entries depends on whether the total calories for the day exceed the norm (an editable parameter in the user profile). The entire REST interface is covered by JUnit tests using Spring MVC Test and Spring Security Test.
 
